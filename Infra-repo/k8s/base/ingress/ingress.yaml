@@ -9,10 +9,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - app.k8s.kentaskapp.online
+    - app.kentaskapp.online
     secretName: taskapp-tls
   rules:
-  - host: app.k8s.kentaskapp.online
+  - host: app.kentaskapp.online
     http:
       paths:
       - path: /
