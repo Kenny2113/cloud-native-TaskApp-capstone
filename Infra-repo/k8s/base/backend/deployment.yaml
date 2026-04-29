@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: taskapp-backend
-        image: 493608842618.dkr.ecr.us-east-1.amazonaws.com/taskapp-backend:16934fb390314bb02fb713791fd29a4de74d7b0e
+        image: 493608842618.dkr.ecr.us-east-1.amazonaws.com/taskapp-backend:990aec28ce7bde713af940a49f15770d6a54e196
         ports:
         - containerPort: 5000
         env:
