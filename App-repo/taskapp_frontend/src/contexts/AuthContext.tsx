@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface User {
   id: number;
@@ -23,29 +23,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
+
   useEffect(() => {
     const savedToken = localStorage.getItem('auth_token');
+
     if (savedToken) {
       setToken(savedToken);
+
       const savedUser = localStorage.getItem('auth_user');
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       }
     }
+
     setLoading(false);
   }, []);
 
   const login = async (username: string, password: string) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL || '/api'}/auth/login`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      }
-    );
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
     if (!response.ok) {
       const error = await response.json();
@@ -53,23 +55,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const data = await response.json();
+
     setToken(data.token);
     setUser(data.user);
+
     localStorage.setItem('auth_token', data.token);
     localStorage.setItem('auth_user', JSON.stringify(data.user));
   };
 
   const signup = async (username: string, password: string) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/signup`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      }
-    );
+    const response = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
     if (!response.ok) {
       const error = await response.json();
@@ -77,8 +78,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const data = await response.json();
+
     setToken(data.token);
     setUser(data.user);
+
     localStorage.setItem('auth_token', data.token);
     localStorage.setItem('auth_user', JSON.stringify(data.user));
   };
@@ -86,20 +89,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     setToken(null);
+
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      token, 
-      loading, 
-      login, 
-      signup, 
-      logout, 
-      isAuthenticated: !!token 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        login,
+        signup,
+        logout,
+        isAuthenticated: !!token,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -107,8 +113,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
+
   return context;
 }
