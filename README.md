@@ -297,7 +297,7 @@ curl -X POST https://app.kentaskapp.online/api/auth/signup \
 
 ## 👨‍💻 Author
 
-**Kenneth** — DevOps Engineer / Cloud Infrastructure Enthusiast
+**Kennedy Nwachukwu** — DevOps Engineer / Cloud Infrastructure Enthusiast
 
 > Built with real infrastructure, real debugging, and real deployment challenges — not just tutorials.
 
