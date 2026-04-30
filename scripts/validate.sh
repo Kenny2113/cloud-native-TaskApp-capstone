@@ -6,8 +6,8 @@
 
 set -euo pipefail
 
-export NAME=taskapp.kentaskapp.online
-export KOPS_STATE_STORE=s3://taskapp-kops-state
+export NAME=k8s.kentaskapp.online
+export KOPS_STATE_STORE=s3://taskapp-kops-state-493608842618
 export AWS_REGION=us-east-1
 
 echo "========================================"
