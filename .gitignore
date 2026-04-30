@@ -28,4 +28,7 @@ build/
 # OS / editor
 .DS_Store
 .vscode/
-.idea/
+.idea/*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
