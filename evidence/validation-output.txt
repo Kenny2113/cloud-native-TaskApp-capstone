@@ -1,0 +1,136 @@
+========================================
+  TaskApp Cluster Validation Report
+  Thu, Apr 30, 2026 11:16:45 AM
+========================================
+
+  kOps Cluster Validation
+----------------------------
+Validating cluster k8s.kentaskapp.online
+
+INSTANCE GROUPS
+NAME				ROLE		MACHINETYPE	MIN	MAX	SUBNETS
+control-plane-us-east-1a	ControlPlane	t3.medium	1	1	us-east-1a
+control-plane-us-east-1b	ControlPlane	t3.medium	1	1	us-east-1b
+control-plane-us-east-1c	ControlPlane	t3.medium	1	1	us-east-1c
+nodes-us-east-1a		Node		t3.medium	1	1	us-east-1a
+nodes-us-east-1b		Node		t3.medium	1	1	us-east-1b
+nodes-us-east-1c		Node		t3.medium	1	1	us-east-1c
+
+NODE STATUS
+NAME			ROLE		READY
+i-010f4d6ca0f55aa22	node		True
+i-028920b37d9ba489e	node		True
+i-04aa9207846c66a6d	control-plane	True
+i-04ed47e28e33350a1	node		True
+i-088a11237612aa00d	control-plane	True
+i-0fc1f4742b0565810	control-plane	True
+
+Your cluster k8s.kentaskapp.online is ready
+
+  Node Status
+----------------------------
+NAME                  STATUS   ROLES           AGE    VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION    CONTAINER-RUNTIME
+i-010f4d6ca0f55aa22   Ready    node            2d6h   v1.35.3   10.0.11.161   <none>        Ubuntu 24.04.4 LTS   6.17.0-1007-aws   containerd://2.1.6
+i-028920b37d9ba489e   Ready    node            2d6h   v1.35.3   10.0.12.73    <none>        Ubuntu 24.04.4 LTS   6.17.0-1007-aws   containerd://2.1.6
+i-04aa9207846c66a6d   Ready    control-plane   2d6h   v1.35.3   10.0.12.23    <none>        Ubuntu 24.04.4 LTS   6.17.0-1007-aws   containerd://2.1.6
+i-04ed47e28e33350a1   Ready    node            2d6h   v1.35.3   10.0.13.103   <none>        Ubuntu 24.04.4 LTS   6.17.0-1007-aws   containerd://2.1.6
+i-088a11237612aa00d   Ready    control-plane   2d6h   v1.35.3   10.0.11.40    <none>        Ubuntu 24.04.4 LTS   6.17.0-1007-aws   containerd://2.1.6
+i-0fc1f4742b0565810   Ready    control-plane   2d6h   v1.35.3   10.0.13.247   <none>        Ubuntu 24.04.4 LTS   6.17.0-1007-aws   containerd://2.1.6
+
+  All Pods in taskapp Namespace
+----------------------------
+NAME                                READY   STATUS    RESTARTS   AGE     IP               NODE                  NOMINATED NODE   READINESS GATES
+postgres-7b48b88fb-25z9m            1/1     Running   0          2m15s   100.104.180.19   i-028920b37d9ba489e   <none>           <none>
+taskapp-backend-dfbf9c86b-f49kr     1/1     Running   0          26h     100.104.180.18   i-028920b37d9ba489e   <none>           <none>
+taskapp-backend-dfbf9c86b-n78jz     1/1     Running   0          26h     100.103.18.85    i-010f4d6ca0f55aa22   <none>           <none>
+taskapp-frontend-6989f77fdc-gmhl2   1/1     Running   0          26h     100.119.36.18    i-04ed47e28e33350a1   <none>           <none>
+taskapp-frontend-6989f77fdc-krxfd   1/1     Running   0          26h     100.104.180.17   i-028920b37d9ba489e   <none>           <none>
+
+  Deployments and Replica Count
+----------------------------
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+postgres           1/1     1            1           2d5h
+taskapp-backend    2/2     2            2           2d2h
+taskapp-frontend   2/2     2            2           2d1h
+
+  PersistentVolumeClaims
+----------------------------
+NAME           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS    VOLUMEATTRIBUTESCLASS   AGE
+postgres-pvc   Bound    pvc-8953175b-2219-4677-89ab-0c7319eba4e8   5Gi        RWO            kops-csi-1-21   <unset>                 2d5h
+
+  TLS Certificate Status
+----------------------------
+NAME          READY   SECRET        AGE
+taskapp-tls   True    taskapp-tls   47h
+Status:
+  Conditions:
+    Last Transition Time:  2026-04-28T17:42:23Z
+    Message:               Certificate is up to date and has not expired
+    Observed Generation:   8
+    Reason:                Ready
+    Status:                True
+    Type:                  Ready
+  Not After:               2026-07-27T16:43:51Z
+  Not Before:              2026-04-28T16:43:52Z
+  Renewal Time:            2026-06-27T16:43:51Z
+  Revision:                5
+
+  Ingress Configuration
+----------------------------
+NAME              CLASS   HOSTS                   ADDRESS                                                                         PORTS     AGE
+taskapp-ingress   nginx   app.kentaskapp.online   a2fd7393215cb437c96fff277457b07c-b3928ecbc68d18f2.elb.us-east-1.amazonaws.com   80, 443   2d
+
+  Supporting Namespaces
+----------------------------
+NAME                                        READY   STATUS      RESTARTS   AGE
+ingress-nginx-admission-create-4j4nv        0/1     Completed   0          2d1h
+ingress-nginx-admission-patch-tppcj         0/1     Completed   0          2d1h
+ingress-nginx-controller-6476876445-v5kms   1/1     Running     0          47h
+NAME                                      READY   STATUS    RESTARTS   AGE
+cert-manager-68756bcf6f-9g649             1/1     Running   0          47h
+cert-manager-cainjector-c664cf9b8-rcmqr   1/1     Running   0          47h
+cert-manager-webhook-5749c6dc95-zsvkj     1/1     Running   0          47h
+NAME                                                READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0                     1/1     Running   0          43h
+argocd-applicationset-controller-758b8ff5f6-4bqqv   1/1     Running   0          43h
+argocd-dex-server-5bdc45f5b6-swm9d                  1/1     Running   0          43h
+argocd-notifications-controller-6c996786fb-xp95f    1/1     Running   0          43h
+argocd-redis-88cd9986-l8bmz                         1/1     Running   0          43h
+argocd-repo-server-5456d44cd8-vxvpm                 1/1     Running   0          43h
+argocd-server-748964bbbc-trngn                      1/1     Running   0          43h
+
+  Live Application Check
+----------------------------
+Testing HTTPS endpoint...
+HTTP/1.1 200 OK
+Date: Thu, 30 Apr 2026 10:17:27 GMT
+Content-Type: text/html
+Content-Length: 608
+Connection: keep-alive
+
+Testing HTTP redirect to HTTPS...
+HTTP/1.1 308 Permanent Redirect
+Date: Thu, 30 Apr 2026 10:17:29 GMT
+Content-Type: text/html
+Content-Length: 164
+Connection: keep-alive
+
+Testing API endpoint...
+{"database":"(psycopg2.OperationalError) server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request.\n\n[SQL: SELECT 1]\n(Background on this error at: https://sqlalche.me/e/20/e3q8)","status":"unhealthy","timestamp":"2026-04-30T10:17:30.969432"}
+
+  Resource Limits Check
+----------------------------
+postgres-7b48b88fb-25z9m
+  postgres: cpu= mem=
+taskapp-backend-dfbf9c86b-f49kr
+  taskapp-backend: cpu=250m mem=526Mi
+taskapp-backend-dfbf9c86b-n78jz
+  taskapp-backend: cpu=250m mem=526Mi
+taskapp-frontend-6989f77fdc-gmhl2
+  taskapp-frontend: cpu=100m mem=128Mi
+taskapp-frontend-6989f77fdc-krxfd
+  taskapp-frontend: cpu=100m mem=128Mi
+
+========================================
+  Validation Complete
+========================================
