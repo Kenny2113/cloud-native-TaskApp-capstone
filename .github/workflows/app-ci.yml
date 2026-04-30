@@ -5,7 +5,8 @@ on:
     branches:
       - main
     paths:
-      - "App-repo/**"
+      - "taskapp_backend/**"
+      - "taskapp_frontend/**"
       - ".github/workflows/app-ci.yml"
 
 permissions:
@@ -38,7 +39,7 @@ jobs:
 
       - name: Build backend image
         run: |
-          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO:$IMAGE_TAG ./App-repo/taskapp_backend
+          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO:$IMAGE_TAG ./taskapp_backend
 
       - name: Push backend image
         run: |
@@ -46,7 +47,7 @@ jobs:
 
       - name: Build frontend image
         run: |
-          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:$IMAGE_TAG ./App-repo/taskapp_frontend
+          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO:$IMAGE_TAG ./taskapp_frontend
 
       - name: Push frontend image
         run: |
@@ -54,13 +55,13 @@ jobs:
 
       - name: Update Kubernetes manifests with new image
         run: |
-          sed -i "s|image: .*taskapp-backend:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/taskapp-backend:$IMAGE_TAG|g" Infra-repo/k8s/base/backend/deployment.yaml
-          sed -i "s|image: .*taskapp-frontend:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/taskapp-frontend:$IMAGE_TAG|g" Infra-repo/k8s/base/frontend/deployment.yaml
+          sed -i "s|image: .*taskapp-backend:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/taskapp-backend:$IMAGE_TAG|g" k8s/base/backend/deployment.yaml
+          sed -i "s|image: .*taskapp-frontend:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/taskapp-frontend:$IMAGE_TAG|g" k8s/base/frontend/deployment.yaml
 
       - name: Commit and push updated manifests
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add Infra-repo/k8s
+          git add k8s
           git commit -m "Update image tag to $IMAGE_TAG" || echo "No manifest changes to commit"
           git push
