@@ -1,0 +1,193 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  name: taskapp.kentaskapp.online
+spec:
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://taskapp-kops-state/taskapp.kentaskapp.online
+  dnsZone: kentaskapp.online
+
+  # Network configuration
+  networkCIDR: 10.0.0.0/16
+  networking:
+    calico: {}
+
+  # Topology — masters and nodes in private subnets
+  topology:
+    masters: private
+    nodes: private
+    dns:
+      type: Public
+
+  # Subnets — 3 public, 3 private across 3 AZs
+  subnets:
+    - cidr: 10.0.1.0/24
+      name: us-east-1a-public
+      type: Public
+      zone: us-east-1a
+
+    - cidr: 10.0.2.0/24
+      name: us-east-1b-public
+      type: Public
+      zone: us-east-1b
+
+    - cidr: 10.0.3.0/24
+      name: us-east-1c-public
+      type: Public
+      zone: us-east-1c
+
+    - cidr: 10.0.11.0/24
+      name: us-east-1a-private
+      type: Private
+      zone: us-east-1a
+      egress: nat-az-a
+
+    - cidr: 10.0.12.0/24
+      name: us-east-1b-private
+      type: Private
+      zone: us-east-1b
+      egress: nat-az-b
+
+    - cidr: 10.0.13.0/24
+      name: us-east-1c-private
+      type: Private
+      zone: us-east-1c
+      egress: nat-az-c
+
+  # etcd — distributed across 3 AZs with automated S3 backups
+  etcdClusters:
+    - cpuRequest: 200m
+      memoryRequest: 100Mi
+      etcdMembers:
+        - instanceGroup: master-us-east-1a
+          name: a
+        - instanceGroup: master-us-east-1b
+          name: b
+        - instanceGroup: master-us-east-1c
+          name: c
+      name: main
+      backups:
+        backupStore: s3://taskapp-kops-state/etcd-backups/main
+
+    - etcdMembers:
+        - instanceGroup: master-us-east-1a
+          name: a
+        - instanceGroup: master-us-east-1b
+          name: b
+        - instanceGroup: master-us-east-1c
+          name: c
+      name: events
+      backups:
+        backupStore: s3://taskapp-kops-state/etcd-backups/events
+
+  # IAM configuration
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+
+  # Kubernetes version
+  kubernetesVersion: 1.28.6
+
+  # Pod and service CIDRs
+  podCIDR: 100.96.0.0/11
+  serviceClusterIPRange: 100.64.0.0/13
+
+  # EBS CSI Driver
+  cloudConfig:
+    awsEBSCSIDriver:
+      enabled: true
+
+  # Cluster Autoscaler
+  clusterAutoscaler:
+    enabled: true
+    expander: least-waste
+    scaleDownUtilizationThreshold: "0.5"
+    scaleDownUnneededTime: 10m
+
+  # SSH and API access
+  sshAccess:
+    - 0.0.0.0/0
+  kubernetesApiAccess:
+    - 0.0.0.0/0
+
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: taskapp.kentaskapp.online
+  name: master-us-east-1a
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20240301
+  instanceType: t3.medium
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+    - us-east-1a-private
+
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: taskapp.kentaskapp.online
+  name: master-us-east-1b
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20240301
+  instanceType: t3.medium
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+    - us-east-1b-private
+
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: taskapp.kentaskapp.online
+  name: master-us-east-1c
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20240301
+  instanceType: t3.medium
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+    - us-east-1c-private
+
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: taskapp.kentaskapp.online
+  name: nodes
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20240301
+  instanceType: t3.medium
+  maxSize: 6
+  minSize: 3
+  role: Node
+  # Spot Instances for cost optimisation
+  mixedInstancesPolicy:
+    instances:
+      - t3.medium
+      - t3.large
+    onDemandAboveBase: 0
+    onDemandBase: 0
+    spotAllocationStrategy: capacity-optimized
+  subnets:
+    - us-east-1a-private
+    - us-east-1b-private
+    - us-east-1c-private
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes
