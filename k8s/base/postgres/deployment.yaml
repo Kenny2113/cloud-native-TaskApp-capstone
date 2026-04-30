@@ -23,6 +23,13 @@ spec:
         envFrom:
         - secretRef:
             name: postgres-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
@@ -32,6 +39,11 @@ spec:
             port: 5432
           initialDelaySeconds: 10
           periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 30
+          periodSeconds: 20
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
